@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bbe07475e781a143b6ab4ae12ab2a1f, type: 3}
-  m_Name: Default Rope2D
+  m_Name: DefaultRope2D
   m_EditorClassIdentifier: 
   ropeWidth: 0.2
   lineWidth:
@@ -18,56 +18,29 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
-      inSlope: 11.624025
-      outSlope: 11.624025
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.086687006
-      value: 1.0076519
-      inSlope: 2.4717019
-      outSlope: 2.4717019
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.19758607
-    - serializedVersion: 3
-      time: 0.6714013
-      value: 0.85769653
-      inSlope: -0.34373862
-      outSlope: -0.34373862
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.91386956
-      value: 0.7531884
-      inSlope: -4.0073643
-      outSlope: -4.0073643
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 0.1
-      inSlope: -7.5837107
-      outSlope: -7.5837107
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 34
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   lineColor:
     serializedVersion: 2
-    key0: {r: 0, g: 0, b: 0, a: 1}
-    key1: {r: 0, g: 0, b: 0, a: 1}
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
     key2: {r: 0, g: 0, b: 0, a: 0}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
@@ -94,15 +67,6 @@ MonoBehaviour:
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
   ropeMat: {fileID: 2100000, guid: a5ae9304d1407da40b95b29ee0cf26da, type: 2}
-  sortingLayerName: Default
-  RopeSubDivision: 30
-  defaultRopeTension: 0
-  isExtendable: 0
-  isStretchable: 0
   iteration: 12
   gravity: {x: 0, y: -1}
   damp: 0
-  simulationUpdate: 0
-  renderUpdate: 0
-  ropeCanBreak: 1
-  ropeBreakThreshold: 1.5

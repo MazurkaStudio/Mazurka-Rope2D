@@ -26,6 +26,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.36, y: -0.09, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2980501478904801218}
   m_RootOrder: 0
@@ -42,7 +43,7 @@ GameObject:
   - component: {fileID: 2980501478904801085}
   - component: {fileID: 2980501478904801084}
   m_Layer: 0
-  m_Name: Rope2D
+  m_Name: DefaultRope2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58,6 +59,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2980501478567598002}
   - {fileID: 2980501479370425757}
@@ -144,56 +146,29 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
-        inSlope: 11.624025
-        outSlope: 11.624025
+        value: 1
+        inSlope: 0
+        outSlope: 0
         tangentMode: 34
         weightedMode: 0
         inWeight: 0
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.086687006
-        value: 1.0076519
-        inSlope: 2.4717019
-        outSlope: 2.4717019
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.19758607
-      - serializedVersion: 3
-        time: 0.6714013
-        value: 0.85769653
-        inSlope: -0.34373862
-        outSlope: -0.34373862
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.91386956
-        value: 0.7531884
-        inSlope: -4.0073643
-        outSlope: -4.0073643
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
+        outWeight: 0
       - serializedVersion: 3
         time: 1
-        value: 0.1
-        inSlope: -7.5837107
-        outSlope: -7.5837107
+        value: 1
+        inSlope: 0
+        outSlope: 0
         tangentMode: 34
         weightedMode: 0
-        inWeight: 0.33333334
+        inWeight: 0
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0, g: 0, b: 0, a: 1}
-      key1: {r: 0, g: 0, b: 0, a: 1}
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -222,7 +197,7 @@ LineRenderer:
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
-    textureMode: 0
+    textureMode: 1
     shadowBias: 0.5
     generateLightingData: 0
   m_UseWorldSpace: 1
@@ -239,11 +214,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06b44bda7c126a4ea82ce4e72482f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drawRopeOnStart: 1
+  _drawRopeOnStart: 1
   _isBridgeRope: 1
   _startAnchor: {fileID: 2980501478567598002}
   _endAnchor: {fileID: 2980501479370425757}
-  ropePreset: {fileID: 11400000, guid: e3b3b36d21239194783dd4189f3e5dbe, type: 2}
+  _ropePreset: {fileID: 11400000, guid: e3b3b36d21239194783dd4189f3e5dbe, type: 2}
+  _ropeSubDivision: 25
+  _defaultRopeTension: 0
+  _isExtendable: 0
+  _isStretchable: 0
+  _ropeCanBreak: 0
+  _ropeBreakThreshold: 1.5
 --- !u!1 &2980501479370425756
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,6 +251,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2980501478904801218}
   m_RootOrder: 1
