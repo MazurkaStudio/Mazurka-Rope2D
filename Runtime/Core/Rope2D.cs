@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MazurkaGameKit.Rope2D
 {
@@ -9,7 +11,9 @@ namespace MazurkaGameKit.Rope2D
     [RequireComponent(typeof(LineRenderer))]
     public partial class Rope2D : MonoBehaviour
     {
-        [SerializeField] private bool _drawRopeOnStart = true;
+        private const float TENSION_LIMITS = 10f;
+        
+        [SerializeField] private bool _simulate = true;
         [SerializeField] private bool _isBridgeRope;
         [SerializeField] private Transform _startAnchor;
         [SerializeField] private Transform _endAnchor;
@@ -17,14 +21,21 @@ namespace MazurkaGameKit.Rope2D
         
         
         [Range(10, 60), SerializeField] private int _ropeSubDivision = 25;
-        [Range(-15f, 15f), SerializeField] private float _defaultRopeTension;
+        [Range(-TENSION_LIMITS, TENSION_LIMITS), SerializeField] private float _defaultRopeTension;
+        [Range(1, 30), SerializeField] private int _iteration = 12;
+        [SerializeField] private float _damp = 3;
+        [SerializeField] private Vector3 _gravity = Vector3.down;
+        
         [SerializeField] private bool _isExtendable;
         [SerializeField] private bool _isStretchable;
         [SerializeField] private bool _ropeCanBreak;
         [SerializeField, Range(1.01f, 10f)] private float _ropeBreakThreshold = 1.5f;
         
+        [SerializeField] private List<Rope2DFixedObject> _allRope2DObjects = new();
+        [SerializeField] private LineRenderer lineRenderer;
+        
         private bool wasInit;
-        private LineRenderer lineRenderer;
+      
         
         public Rope2D_RopePreset Preset => _ropePreset;
         public float RopeEnergy => RopeForceSumm.magnitude;
@@ -34,20 +45,18 @@ namespace MazurkaGameKit.Rope2D
         public bool IsBridgeRope => _isBridgeRope;
         public bool IsExtendable => _isExtendable;
         public bool IsStretchable => _isStretchable;
-        
+
+        public bool IsEnable { get; private set; } = true;
         public Vector3[] RopeSegmentsOld { get; private set; }
         public Vector3[] RopeSegmentsNow { get; private set; }
         public Vector3 RopeForceSumm { get; private set; }
         public float RopeDistance { get; private set; }
         public float RopeSegLenght { get; private set; }
-        public Vector2 GravityForce { get; private set; }
-        public bool CanBeSimulate { get; private set; }
-
         public float Tension { get; private set; }
-       
-        
 
-        
+
+        public UnityAction<bool> isEnable;
+       
         
         public static Rope2D CreateRope(Transform from, Transform to, Rope2D_RopePreset ropePreset, Transform parent, 
             bool isBridgeRope = false,  float defaultTension = 0f, bool isExtendable = false, bool isStretchable = false, bool ropeCanBreak  = false, float ropeBreakThreshold = 1.5f)
@@ -73,91 +82,49 @@ namespace MazurkaGameKit.Rope2D
         
         
         #region Mono
-        
-        private void Awake()
-        {
-            lineRenderer = GetComponent<LineRenderer>();
-            InitializeLineRenderer();
-        }
 
         private void OnEnable()
         {
-            if (_drawRopeOnStart && !wasInit)
+            if (!wasInit)
             {
                 InitializeRope();
             }
         }
-        
-        private void Start()
-        {
-            if (_ropePreset != null)
-            {
-                ApplyPreset();
-            }
 
-            if (_drawRopeOnStart && !wasInit)
-            {
-                InitializeRope();
-            }
-            else if (!wasInit)
-            {
-                lineRenderer.enabled = false;
-            }
-        }
-        
         private void FixedUpdate()
         {
-            if (!wasInit || !CanBeSimulate || _ropePreset == null)
-            {
-                return;
-            }
+            if (!_simulate)  return;
+            
             SimulateRope();
             DrawRope();
-        }
-        
-        private void OnDisable()
-        {
-            CanBeSimulate = false;
+            UpdateObjects();
         }
         
         #endregion
         
         
         #region Initialize
-
-        private void InitializeLineRenderer()
-        {
-            lineRenderer.textureMode = LineTextureMode.Tile;
-            lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            lineRenderer.receiveShadows = false;
-            lineRenderer.allowOcclusionWhenDynamic = false;
-        }
         
-        /// <summary>
-        /// Create points from preset info, and mark as can simulate
-        /// </summary>
-        /// <param name="tension"></param>
         private void InitializeRope()
         {
             //CHECK FOR ALL COMPONENTS
             if (EndAnchor == null || StartAnchor == null || _ropePreset == null || EndAnchor == StartAnchor)
             {
-                gameObject.SetActive(false);
+                DisableRope();
                 throw new System.Exception(("Rope is not correctly initialized = " + gameObject.name));
             }
 
-            CreateRopePoints();
+            if (_simulate)CreateRopePoints();
+            else CopyRopePoint(lineRenderer);
+
             DrawRope();
-
-            CanBeSimulate = true;
+            InitializeRopeObjects();
+            
             wasInit = true;
-
-            lineRenderer.enabled = true;
         }
         
         private void CreateRopePoints()
         {
-
             RopeDistance = Vector2.Distance(StartAnchor.position, EndAnchor.position) + _defaultRopeTension;
             RopeSegLenght = RopeDistance / (RopeSubDivision * 1f);
 
@@ -179,6 +146,22 @@ namespace MazurkaGameKit.Rope2D
             }
         }
 
+        private void CopyRopePoint(LineRenderer lineRenderer)
+        {
+            RopeDistance = Vector2.Distance(StartAnchor.position, EndAnchor.position) + _defaultRopeTension;
+            RopeSegLenght = RopeDistance / (RopeSubDivision * 1f);
+            
+            int count = lineRenderer.positionCount;
+            RopeSegmentsNow = new Vector3[count];
+            RopeSegmentsOld = new Vector3[count];
+            
+            for (int i = 0; i < count; i++)
+            {
+                RopeSegmentsNow[i] = lineRenderer.GetPosition(i);
+                RopeSegmentsOld[i] = lineRenderer.GetPosition(i);
+            }
+        }
+
         #endregion
         
         
@@ -186,19 +169,20 @@ namespace MazurkaGameKit.Rope2D
 
         public void EnableRope()
         {
-            if (wasInit)
-            {
-                lineRenderer.enabled = true;
-                CanBeSimulate = true;
-            }
+            if (!wasInit && _simulate) InitializeRope();
+            
+            lineRenderer.enabled = true;
+            IsEnable = true;
+            isEnable?.Invoke(true);
         }
 
-        public void FreezeRope() => CanBeSimulate = false;
+        public void FreezeRope(bool value) => _simulate = value;
 
         public void DisableRope()
         {
+            IsEnable = false;
             lineRenderer.enabled = false;
-            CanBeSimulate = false;
+            isEnable?.Invoke(false);
         }
 
         public void BreakRope()
@@ -217,24 +201,14 @@ namespace MazurkaGameKit.Rope2D
             RopeDistance = newDistance + _defaultRopeTension;
             RopeSegLenght = RopeDistance / RopeSubDivision;
         }
-        
-        public void ResetRopeFromPool()
-        {
-            if (!wasInit)
-            {
-                ApplyPreset();
-            }
-            
-            InitializeRope();
-        }
-        
+
         public void ChangeEndAnchor(Transform newAnchor) => _endAnchor = newAnchor;
         
         public void ChangeStartAnchor(Transform newAnchor) => _startAnchor = newAnchor;
 
         public void SetRopePreset(Rope2D_RopePreset ropePreset)
         {
-            this._ropePreset = ropePreset;
+            _ropePreset = ropePreset;
 
             ApplyPreset();
             
@@ -256,9 +230,6 @@ namespace MazurkaGameKit.Rope2D
             //Size
             lineRenderer.widthCurve = _ropePreset.lineWidth;
             lineRenderer.widthMultiplier = _ropePreset.ropeWidth;
-
-            //Simulation
-            GravityForce = _ropePreset.gravity;
         }
         
         #endregion

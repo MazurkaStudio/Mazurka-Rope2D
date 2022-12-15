@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MazurkaGameKit.Rope2D
@@ -13,15 +14,15 @@ namespace MazurkaGameKit.Rope2D
                 Vector3 velocity = RopeSegmentsNow[i] - RopeSegmentsOld[i];
                 RopeSegmentsOld[i] = RopeSegmentsNow[i];
                 RopeSegmentsNow[i] += velocity;
-                RopeSegmentsNow[i] += (Vector3)GravityForce * Time.fixedDeltaTime;
-                RopeSegmentsNow[i] += -velocity * _ropePreset.damp * Time.fixedDeltaTime;
+                RopeSegmentsNow[i] += _gravity * Time.fixedDeltaTime;
+                RopeSegmentsNow[i] += -velocity * _damp * Time.fixedDeltaTime;
                 RopeForceSumm += RopeSegmentsNow[i] - RopeSegmentsOld[i];
             }
 
             if (_isBridgeRope)
             {
                 //CONSTRAINTS
-                for (int i = 0; i < _ropePreset.iteration; i++)
+                for (int i = 0; i < _iteration; i++)
                 {
                     BridgeRopeConstraints();
                 }
@@ -29,7 +30,7 @@ namespace MazurkaGameKit.Rope2D
             else
             {
                 //CONSTRAINTS
-                for (int i = 0; i < _ropePreset.iteration; i++)
+                for (int i = 0; i < _iteration; i++)
                 {
                     SimpleRopeConstraints();
                 }
@@ -129,5 +130,52 @@ namespace MazurkaGameKit.Rope2D
         {
             lineRenderer.SetPositions(RopeSegmentsNow);
         }
+
+
+        
+
+        public void InitializeRopeObjects()
+        {
+            foreach (var ropeObject in _allRope2DObjects)
+            {
+                ropeObject.InitializeRopeObject(this);
+            }
+        }
+        
+        private void RegisterRopeObject(Rope2DFixedObject ropeFixedObject)
+        {
+            _allRope2DObjects.Add(ropeFixedObject);
+        }
+
+        private void UnregisterRopeObject(Rope2DFixedObject ropeFixedObject)
+        {
+            _allRope2DObjects.Remove(ropeFixedObject);
+        }
+        
+        private void UpdateObjects()
+        {
+            foreach (var ropeObject in _allRope2DObjects)
+            {
+                ropeObject.UpdateRopeObject();
+            }
+        }
+        
+        #if UNITY_EDITOR
+
+        [ContextMenu("Get All Child Rope Objects")]
+        public void GetAllChildRopeObject()
+        {
+            Rope2DFixedObject[] ropeObject = GetComponentsInChildren<Rope2DFixedObject>();
+
+            for (int i = 0; i < ropeObject.Length; i++)
+            {
+                if (!_allRope2DObjects.Contains(ropeObject[i]))
+                {
+                    RegisterRopeObject(ropeObject[i]);
+                }
+            }
+        }
+        
+        #endif
     }
 }
