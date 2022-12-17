@@ -150,11 +150,14 @@ namespace MazurkaGameKit.Rope2D
             EditorGUILayout.EndVertical();
             
             EditorGUILayout.Space(10f);
-            
-            EditorGUILayout.BeginVertical("box");
-            EditorGUILayout.PropertyField(m_ropeCanBreak);
-            EditorGUILayout.PropertyField(m_ropeBreakThreshold);
-            EditorGUILayout.EndVertical();
+
+            if (!m_isExtendable.boolValue)
+            {
+                EditorGUILayout.BeginVertical("box");
+                EditorGUILayout.PropertyField(m_ropeCanBreak);
+                EditorGUILayout.PropertyField(m_ropeBreakThreshold);
+                EditorGUILayout.EndVertical();
+            }
         }
 
         private void DrawRopeObjectPanel()
@@ -171,7 +174,6 @@ namespace MazurkaGameKit.Rope2D
 
         private void DrawSimulationPanel()
         {
-                        
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("Be careful, editor simulation is not always representative of in game simulation");
             EditorGUILayout.LabelField("Shortcut : Keydown S");

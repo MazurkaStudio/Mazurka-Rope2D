@@ -36,6 +36,7 @@ namespace MazurkaGameKit.Rope2D
         [SerializeField] private LineRenderer lineRenderer;
         
         private bool wasInit;
+        private bool isVisible;
       
         
         public Rope2D_RopePreset Preset => _ropePreset;
@@ -91,11 +92,13 @@ namespace MazurkaGameKit.Rope2D
 
         private void FixedUpdate()
         {
-            if (!_simulate)  return;
+            if (!_simulate || !isVisible)  return;
             
             SimulateRope();
             DrawRope();
             UpdateObjects();
+            
+            Debug.Log(Vector3.Distance(EndAnchor.position , RopeSegmentsNow[^1]));
         }
 
         private void OnDisable()
@@ -103,6 +106,16 @@ namespace MazurkaGameKit.Rope2D
             DisableRope();
         }
 
+        private void OnBecameInvisible()
+        {
+            isVisible = false;
+        }
+
+        private void OnBecameVisible()
+        {
+            isVisible = true;
+        }
+        
         #endregion
         
         

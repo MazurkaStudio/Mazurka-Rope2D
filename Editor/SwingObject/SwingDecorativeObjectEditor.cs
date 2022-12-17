@@ -69,7 +69,9 @@ namespace MazurkaGameKit.Rope2D
             EditorGUILayout.Space(10f);
             
             DrawVisualProperties();
-
+            
+            EditorGUILayout.Space(30f);
+            
             DrawSimulationPanel();
             
             serializedObject.ApplyModifiedProperties();
