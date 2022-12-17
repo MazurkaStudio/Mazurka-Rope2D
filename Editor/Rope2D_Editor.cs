@@ -28,6 +28,11 @@ namespace MazurkaGameKit.Rope2D
         private SerializedProperty m_ropeBreakThreshold;
         private SerializedProperty m_ropesObject;
         
+        private bool canSimulate;
+
+        private const float TENSION_HANDLE_FACTOR = 0.05f;
+        
+        
         private void OnEnable()
         {
             EditorApplication.update += Simulate;
@@ -54,12 +59,12 @@ namespace MazurkaGameKit.Rope2D
             
             targetRope.transform.hasChanged = false;
         }
-
-
+        
         private void OnDisable()
         {     
             EditorApplication.update -= Simulate;
         }
+        
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -155,10 +160,6 @@ namespace MazurkaGameKit.Rope2D
             }
         }
 
-        private bool canSimulate;
-
-        private const float TENSION_HANDLE_FACTOR = 0.05f;
-        
         private void OnSceneGUI()
         {
             Vector3 startPos = targetRope.StartAnchor.position;
@@ -240,7 +241,7 @@ namespace MazurkaGameKit.Rope2D
             }
         }
         
-        void Simulate()
+        private void Simulate()
         {
             if (!Application.isPlaying && canSimulate)
                 targetRope.SimulateInEditor();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -85,10 +86,7 @@ namespace MazurkaGameKit.Rope2D
 
         private void OnEnable()
         {
-            if (!wasInit)
-            {
-                InitializeRope();
-            }
+            EnableRope();
         }
 
         private void FixedUpdate()
@@ -99,7 +97,12 @@ namespace MazurkaGameKit.Rope2D
             DrawRope();
             UpdateObjects();
         }
-        
+
+        private void OnDisable()
+        {
+            DisableRope();
+        }
+
         #endregion
         
         
@@ -169,7 +172,7 @@ namespace MazurkaGameKit.Rope2D
 
         public void EnableRope()
         {
-            if (!wasInit && _simulate) InitializeRope();
+            if (!wasInit) InitializeRope();
             
             lineRenderer.enabled = true;
             IsEnable = true;

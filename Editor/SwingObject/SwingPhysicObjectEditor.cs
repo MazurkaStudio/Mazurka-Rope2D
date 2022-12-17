@@ -8,123 +8,151 @@ namespace MazurkaGameKit.Rope2D
     [CanEditMultipleObjects]
     public class SwingPhysicObjectEditor : Editor
     {
+        private const float SWING_OBJECT_SCALE_HANDLES_FACTOR = 1f;
+        private const float ROPE_SCALE_HANDLES_FACTOR = 2f;
+        
+        [MenuItem("GameObject/Mazurka GameKit/Hanged Physic Object")]
+        public static void CreateSwingPhysicObject()
+        {
+            GameObject g = new GameObject("New Hanged Physic Object");
+            g.AddComponent<SwingPhysicObject>();
+            Rope2DEditorHelper.FocusObject(g);
+        }
+        
+        
         private SwingPhysicObject targetSwingObject;
         
-        
-        private bool useMaxDistanceOnly = false;
-        private Sprite swingObjectSprite;
-        private Sprite ropeSprite;
-        private float ropeSpriteWidth;
-        private Rope2D_RopePreset ropePreset;
+        private SerializedProperty m_swingOnStart;
+        private SerializedProperty m_swingOnStartForce;
+        private SerializedProperty m_swingOnStartSign;
+        private SerializedProperty m_usedSprite;
+        private SerializedProperty m_ropePreset;
+        private SerializedProperty m_chainRopeSprite;
+
         
         private void OnEnable()
         {
             targetSwingObject = (SwingPhysicObject)target;
-
-            targetSwingObject.CreateRope();
+            targetSwingObject.CheckRope();
+            InitSerializedProperties();
             
-            useMaxDistanceOnly = targetSwingObject.dJoin.maxDistanceOnly;
-            swingObjectSprite = targetSwingObject.GetSwingObjectSpriteRenderer.sprite;
-            ropeSpriteWidth = targetSwingObject.TryGetRopeSpriteWidth();
-            ropeSprite = targetSwingObject.TryGetRopeSprite();
-            ropePreset = targetSwingObject.TryGetRopePreset();
-
-            if (ropePreset == null)
-            {
-                ropePreset = Resources.Load<Rope2D_RopePreset>("Default Rope2D");
-            }
-            
-            EditorUtility.SetDirty(targetSwingObject.gameObject);
+            targetSwingObject.transform.hasChanged = false;
         }
         
+        private void InitSerializedProperties()
+        {
+            m_swingOnStart = serializedObject.FindProperty("swingOnStart");
+            m_swingOnStartForce = serializedObject.FindProperty("swingOnStartForce");
+            m_swingOnStartSign = serializedObject.FindProperty("swingOnStartSign");
+            
+            m_usedSprite = serializedObject.FindProperty("usedSprite");
+            m_ropePreset = serializedObject.FindProperty("ropePreset");
+            m_chainRopeSprite = serializedObject.FindProperty("chainRopeSprite");
+        }
+        
+        
+        
         public override void OnInspectorGUI()
-        {           
-            EditorGUILayout.BeginVertical("Box");
+        {
+            DrawSwingProperties();
             
-            base.OnInspectorGUI();
+            EditorGUILayout.Space(10);
 
+            DrawUtilsButton();
+            
+            EditorGUILayout.Space(10);
+            
+            DrawVisualProperties();
+
+            
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawSwingProperties()
+        {
+            EditorGUILayout.BeginVertical("box");
+
+            EditorGUILayout.PropertyField(m_swingOnStart);
+            EditorGUILayout.PropertyField(m_swingOnStartForce);
+            EditorGUILayout.PropertyField(m_swingOnStartSign);
+            
             EditorGUILayout.EndVertical();
+        }
 
-            if (GUILayout.Button("Set Swing Object Root to Current Joint Root"))
+        private void DrawUtilsButton()
+        {
+            EditorGUILayout.BeginVertical("box");
+            
+            if (GUILayout.Button("Reset root position"))
             {
-                targetSwingObject.transform.position =
-                    targetSwingObject.dJoin.connectedBody.position + targetSwingObject.dJoin.connectedAnchor;
+                targetSwingObject.ResetRootPosition();
             }
             
-            EditorGUILayout.Space(50f);
-            
-            EditorGUILayout.BeginVertical("HelpBox");
-
-            useMaxDistanceOnly = EditorGUILayout.Toggle("Use Max Distance Only", useMaxDistanceOnly);
-
-            if (useMaxDistanceOnly != targetSwingObject.dJoin.maxDistanceOnly)
+            //CHANGE SWING ROPE TYPE
+            string typeName = targetSwingObject.UseMaxDistanceOnly ? "Switch to straight rope" : "Switch to physic rope";
+            if (GUILayout.Button(typeName))
             {
-                if (useMaxDistanceOnly)
-                {
-                    targetSwingObject.dJoin.maxDistanceOnly = true;
-                    targetSwingObject.chainRope.gameObject.SetActive(false);
-                    targetSwingObject.CreatePhysicRope(ropePreset);
-                    targetSwingObject.physicRope.gameObject.SetActive(true);
-                    EditorUtility.SetDirty(targetSwingObject.gameObject);
-                }
-                else
-                {
-                    targetSwingObject.dJoin.maxDistanceOnly = false;
-                    targetSwingObject.physicRope.gameObject.SetActive(false);
-                    targetSwingObject.CreateSpriteRope(ropeSprite, ropeSpriteWidth);
-                    targetSwingObject.chainRope.gameObject.SetActive(true);
-                    EditorUtility.SetDirty(targetSwingObject.gameObject);
-                }
+                targetSwingObject.ChangeMaxDistanceOnly();
             }
             
-            swingObjectSprite = (Sprite)EditorGUILayout.ObjectField("Swing Object Sprite", swingObjectSprite, typeof(Sprite), false);
+            EditorGUILayout.EndVertical();
+        }
 
-            if (swingObjectSprite != targetSwingObject.GetSwingObjectSpriteRenderer.sprite)
+        private void DrawVisualProperties()
+        {
+            EditorGUILayout.BeginVertical("box");
+            
+            //CHANGE OBJECT SPRITE
+            EditorGUI.BeginChangeCheck();
+            
+            EditorGUILayout.PropertyField(m_usedSprite, new GUIContent("Hanged Object Sprite"));
+            
+            if (EditorGUI.EndChangeCheck())
             {
-                targetSwingObject.SetSprite(swingObjectSprite);
-                EditorUtility.SetDirty(targetSwingObject.gameObject);
+                serializedObject.ApplyModifiedProperties();
+                targetSwingObject.SetSprite();
             }
 
-            
-            if (useMaxDistanceOnly)
+            if (targetSwingObject.UseMaxDistanceOnly)
             {
-                ropePreset = (Rope2D_RopePreset)EditorGUILayout.ObjectField("Rope PReset", ropePreset, typeof(Rope2D_RopePreset), false);
-
-                if (ropePreset != targetSwingObject.TryGetRopePreset())
+                //ROPE PRESET
+                EditorGUI.BeginChangeCheck();
+            
+                EditorGUILayout.PropertyField(m_ropePreset, new GUIContent("Rope Preset"));
+            
+                if (EditorGUI.EndChangeCheck())
                 {
-                    targetSwingObject.CreatePhysicRope(ropePreset);
-                    EditorUtility.SetDirty(targetSwingObject.gameObject);
+                    serializedObject.ApplyModifiedProperties();
+                    targetSwingObject.SetRopePreset();
                 }
             }
             else
             {
- 
+                //CHAIN SPRITE
+                EditorGUI.BeginChangeCheck();
             
-                ropeSprite = (Sprite)EditorGUILayout.ObjectField("Rope Sprite", ropeSprite, typeof(Sprite), false);
-
-                if (ropeSprite != targetSwingObject.TryGetRopeSprite())
+                EditorGUILayout.PropertyField(m_chainRopeSprite, new GUIContent("Chain Sprite"));
+            
+                if (EditorGUI.EndChangeCheck())
                 {
-                    targetSwingObject.CreateSpriteRope(ropeSprite, ropeSpriteWidth);
-                    EditorUtility.SetDirty(targetSwingObject.gameObject);
+                    serializedObject.ApplyModifiedProperties();
+                    targetSwingObject.SetChainSprite();
                 }
             }
             
             EditorGUILayout.EndVertical();
         }
-
-        private const float SWING_OBJECT_SCALE_HANDLES_FACTOR = 1f;
-        private const float ROPE_SCALE_HANDLES_FACTOR = 2f;
+        
+        
+        
         private void OnSceneGUI()
         {
-           
-         
-            
-            EditorGUI.BeginChangeCheck();
-
             //ROOT HANDLE
             Handles.color = Color.magenta;
             Handles.DrawSolidDisc(targetSwingObject.GetRootAnchorPosition, Vector3.forward, 0.2f); 
             
+            EditorGUI.BeginChangeCheck();
+
             //DISTANCE HANDLE
             Vector3 swingObjectAnchorPosition = targetSwingObject.GetSwingObjectPosition;
             swingObjectAnchorPosition = Handles.Slider(swingObjectAnchorPosition, Vector3.down, .2f, Handles.DotHandleCap, 0f);
@@ -132,19 +160,21 @@ namespace MazurkaGameKit.Rope2D
 
 
             //SCALE HANDLE
-            Vector3 scalePos = targetSwingObject.GetSwingObjectPosition + Vector3.right * (targetSwingObject.swingObjectModel.localScale.x * SWING_OBJECT_SCALE_HANDLES_FACTOR);
+            Vector3 scalePos = targetSwingObject.GetSwingObjectPosition + Vector3.right * (targetSwingObject.SwingObjectSize * SWING_OBJECT_SCALE_HANDLES_FACTOR);
             scalePos = Handles.Slider(scalePos, Vector3.right, 0.1f, Handles.DotHandleCap, 0f);
             float scale = (scalePos.x - targetSwingObject.GetSwingObjectPosition.x);
             Handles.DrawWireDisc(targetSwingObject.GetSwingObjectPosition, Vector3.forward, scale, 0.05f); 
             
             
+            float chainWidth =targetSwingObject.ChainWidth;
+            
             //ROPE SCALE HANDLE
-            if (!targetSwingObject.dJoin.maxDistanceOnly)
+            if (!targetSwingObject.UseMaxDistanceOnly)
             {
                 Vector3 centerPos = targetSwingObject.GetSwingObjectPosition + (targetSwingObject.GetRootAnchorPosition - targetSwingObject.GetSwingObjectPosition) / 2;
-                Vector3 scalRopePos = centerPos + (Vector3.right * targetSwingObject.TryGetRopeSpriteWidth() * ROPE_SCALE_HANDLES_FACTOR);
+                Vector3 scalRopePos = centerPos + (Vector3.right * chainWidth * ROPE_SCALE_HANDLES_FACTOR);
                 scalRopePos = Handles.Slider(scalRopePos, Vector3.right, 0.1f, Handles.DotHandleCap, 0f);
-                ropeSpriteWidth = (scalRopePos.x - targetSwingObject.GetSwingObjectPosition.x) / ROPE_SCALE_HANDLES_FACTOR;
+                chainWidth = (scalRopePos.x - targetSwingObject.GetSwingObjectPosition.x) / ROPE_SCALE_HANDLES_FACTOR;
                 Handles.DrawLine(scalRopePos + Vector3.up, scalRopePos + Vector3.down, 0.05f); 
             }
 
@@ -154,15 +184,21 @@ namespace MazurkaGameKit.Rope2D
                 targetSwingObject.SetSwingObjectPosition(swingObjectAnchorPosition);
                 targetSwingObject.ScaleSprite(scale / SWING_OBJECT_SCALE_HANDLES_FACTOR);
                 
-                if (!targetSwingObject.dJoin.maxDistanceOnly)
+                if (!targetSwingObject.UseMaxDistanceOnly)
                 {
-                    targetSwingObject.SetRopeSpriteWidth(ropeSpriteWidth);
+                    targetSwingObject.ChainWidth = chainWidth;
                 }
                 
                 EditorUtility.SetDirty(targetSwingObject.gameObject);
             }
+
+
+            if (targetSwingObject.transform.hasChanged)
+            {
+                targetSwingObject.transform.hasChanged = false;
+                targetSwingObject.GetRope.DrawRopeInEditor();
+            }
         }
-        
     }
 
 }

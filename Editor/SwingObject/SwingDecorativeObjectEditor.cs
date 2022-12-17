@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEditor;
 
@@ -8,84 +9,123 @@ namespace MazurkaGameKit.Rope2D
     [CanEditMultipleObjects]
     public class SwingDecorativeObjectEditor : Editor
     {
+        private const float SWING_OBJECT_SCALE_HANDLES_FACTOR = 1f;
+        private const float ROPE_SCALE_HANDLES_FACTOR = 2f;
+        
+        
+        [MenuItem("GameObject/Mazurka GameKit/Hanged Decorative Object")]
+        public static void CreateSwingDecorativeObject()
+        {
+            GameObject g = new GameObject("New Hanged Decorative Object");
+            g.AddComponent<SwingDecorativeObject>();
+            Rope2DEditorHelper.FocusObject(g);
+        }
+        
         private SwingDecorativeObject targetSwingObject;
+        
+        private SerializedProperty m_isConstant;
+        private SerializedProperty m_windAmplitude;
+        private SerializedProperty m_windFrequency;
+        
+        private SerializedProperty m_usedSprite;
+        private SerializedProperty m_chainSprite;
 
-        private bool simulate;
-        private Sprite swingObjectSprite;
-        private Sprite ropeSprite;
-        private float ropeSpriteWidth;
-
+        private bool simulate = false;
         private void OnEnable()
         {
+            EditorApplication.update += Simulation;
             targetSwingObject = (SwingDecorativeObject)target;
-
-            targetSwingObject.CreateRope();
-
-            simulate = false;
-            swingObjectSprite = targetSwingObject.GetSwingObjectSpriteRenderer.sprite;
-            ropeSpriteWidth = targetSwingObject.TryGetRopeSpriteWidth();
-            ropeSprite = targetSwingObject.TryGetRopeSprite();
-            EditorUtility.SetDirty(targetSwingObject.gameObject);
+            targetSwingObject.CheckRope();
+            InitSerializedProperties();
         }
 
         private void OnDisable()
         {
-            if (targetSwingObject != null)
-            {
-                targetSwingObject.simulate = false;
-                targetSwingObject.ResetSwingObject();
-            }
-            
+            EditorApplication.update -= Simulation;
+
             simulate = false;
+            
+            if (targetSwingObject == null)
+                return;
+            
+            targetSwingObject.ResetSwingObject();
         }
+
+        private void InitSerializedProperties()
+        {
+            m_isConstant = serializedObject.FindProperty("isConstant");
+            m_windAmplitude = serializedObject.FindProperty("windAmplitude");
+            m_windFrequency = serializedObject.FindProperty("windFrequency");
+            
+            m_usedSprite = serializedObject.FindProperty("usedSprite");
+            m_chainSprite = serializedObject.FindProperty("chainSprite");
+        }
+        
 
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.BeginVertical("Box");
+            DrawSwingProperties();
             
-            base.OnInspectorGUI();
+            EditorGUILayout.Space(10f);
+            
+            DrawVisualProperties();
 
+            EditorGUI.BeginChangeCheck();
+            simulate = EditorGUILayout.Toggle("Simulate : ", simulate);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if(simulate == false)
+                    targetSwingObject.ResetSwingObject();
+            }
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawSwingProperties()
+        {
+            EditorGUILayout.BeginVertical("box");
+
+            EditorGUILayout.LabelField("Fake wind properties");
+            EditorGUILayout.PropertyField(m_isConstant);
+            EditorGUILayout.PropertyField(m_windAmplitude);
+            EditorGUILayout.PropertyField(m_windFrequency);
+            
             EditorGUILayout.EndVertical();
+        }
+        
+        private void DrawVisualProperties()
+        {
+            EditorGUILayout.BeginVertical("box");
             
-            EditorGUILayout.Space(50f);
+            EditorGUILayout.LabelField("Hanged object visual properties");
             
-            EditorGUILayout.BeginVertical("HelpBox");
-
-            simulate = EditorGUILayout.Toggle("Simulate", simulate);
-
-            if (simulate != targetSwingObject.simulate)
+            //CHANGE OBJECT SPRITE
+            EditorGUI.BeginChangeCheck();
+            
+            EditorGUILayout.PropertyField(m_usedSprite, new GUIContent("Hanged Object Sprite"));
+            
+            if (EditorGUI.EndChangeCheck())
             {
-                targetSwingObject.ResetSwingObject();
-                targetSwingObject.NewSeed();
-                targetSwingObject.simulate = simulate;
+                serializedObject.ApplyModifiedProperties();
+                targetSwingObject.SetSprite();
             }
 
-            swingObjectSprite = (Sprite)EditorGUILayout.ObjectField("Swing Object Sprite", swingObjectSprite, typeof(Sprite), false);
-
-            if (swingObjectSprite != targetSwingObject.GetSwingObjectSpriteRenderer.sprite)
-            {
-                targetSwingObject.SetSprite(swingObjectSprite);
-                EditorUtility.SetDirty(targetSwingObject.gameObject);
-            }
+            //CHAIN SPRITE
+            EditorGUI.BeginChangeCheck();
             
-            ropeSprite = (Sprite)EditorGUILayout.ObjectField("Rope Sprite", ropeSprite, typeof(Sprite), false);
-
-            if (ropeSprite != targetSwingObject.TryGetRopeSprite())
+            EditorGUILayout.PropertyField(m_chainSprite, new GUIContent("Chain Sprite"));
+            
+            if (EditorGUI.EndChangeCheck())
             {
-                targetSwingObject.CreateSpriteRope(ropeSprite, ropeSpriteWidth);
-                EditorUtility.SetDirty(targetSwingObject.gameObject);
+                serializedObject.ApplyModifiedProperties();
+                targetSwingObject.SetChainSprite();
             }
             
             EditorGUILayout.EndVertical();
         }
 
-        private const float SWING_OBJECT_SCALE_HANDLES_FACTOR = 5f;
-        private const float ROPE_SCALE_HANDLES_FACTOR = 2f;
         private void OnSceneGUI()
         {
-           
-         
-            
             EditorGUI.BeginChangeCheck();
 
             //ROOT HANDLE
@@ -99,27 +139,34 @@ namespace MazurkaGameKit.Rope2D
 
 
             //SCALE HANDLE
-            Vector3 scalePos = targetSwingObject.GetSwingObjectPosition + Vector3.right * (targetSwingObject.swingObjectModel.localScale.x * SWING_OBJECT_SCALE_HANDLES_FACTOR);
+            Vector3 scalePos = targetSwingObject.GetSwingObjectPosition + Vector3.right * (targetSwingObject.SwingObjectSize * SWING_OBJECT_SCALE_HANDLES_FACTOR);
             scalePos = Handles.Slider(scalePos, Vector3.right, 0.1f, Handles.DotHandleCap, 0f);
             float scale = (scalePos.x - targetSwingObject.GetSwingObjectPosition.x);
             Handles.DrawWireDisc(targetSwingObject.GetSwingObjectPosition, Vector3.forward, scale, 0.05f); 
             
             
             //ROPE SCALE HANDLE
+            float chainWidth = targetSwingObject.ChainWidth;
             Vector3 centerPos = targetSwingObject.GetSwingObjectPosition + (targetSwingObject.GetRootAnchorPosition - targetSwingObject.GetSwingObjectPosition) / 2;
-            Vector3 scalRopePos = centerPos + (Vector3.right * targetSwingObject.TryGetRopeSpriteWidth() * ROPE_SCALE_HANDLES_FACTOR);
+            Vector3 scalRopePos = centerPos + (Vector3.right * chainWidth * ROPE_SCALE_HANDLES_FACTOR);
             scalRopePos = Handles.Slider(scalRopePos, Vector3.right, 0.1f, Handles.DotHandleCap, 0f);
-            ropeSpriteWidth = (scalRopePos.x - targetSwingObject.GetSwingObjectPosition.x) / ROPE_SCALE_HANDLES_FACTOR;
+            chainWidth = (scalRopePos.x - targetSwingObject.GetSwingObjectPosition.x) / ROPE_SCALE_HANDLES_FACTOR;
             Handles.DrawLine(scalRopePos + Vector3.up, scalRopePos + Vector3.down, 0.05f); 
             
             if (EditorGUI.EndChangeCheck())
             {
                 targetSwingObject.SetSwingObjectPosition(swingObjectAnchorPosition);
                 targetSwingObject.ScaleSprite(scale / SWING_OBJECT_SCALE_HANDLES_FACTOR);
-                targetSwingObject.SetRopeSpriteWidth(ropeSpriteWidth);
+                targetSwingObject.ChainWidth = chainWidth;
                 
                 EditorUtility.SetDirty(targetSwingObject.gameObject);
             }
+        }
+
+        private void Simulation()
+        {
+            if(simulate)
+                targetSwingObject.Simulate((float)EditorApplication.timeSinceStartup);
         }
         
     }

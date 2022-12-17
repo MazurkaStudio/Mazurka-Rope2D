@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bbe07475e781a143b6ab4ae12ab2a1f, type: 3}
-  m_Name: DefaultRope2D
+  m_Name: DefaultRope2D 1
   m_EditorClassIdentifier: 
   ropeWidth: 0.1
   lineWidth:

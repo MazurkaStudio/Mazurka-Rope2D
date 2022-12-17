@@ -174,6 +174,8 @@ namespace MazurkaGameKit.Rope2D
                     RegisterRopeObject(ropeObject[i]);
                 }
             }
+
+            UpdateObjects();
         }
         
         #endif

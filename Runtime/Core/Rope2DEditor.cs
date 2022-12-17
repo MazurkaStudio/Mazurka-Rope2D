@@ -12,9 +12,10 @@ namespace MazurkaGameKit.Rope2D
         {
             GameObject g = Instantiate(GetDefaultRope);
             g.name = "New Rope2D";
+            Rope2DEditorHelper.FocusObject(g);
         }
         
-        private static Rope2D_RopePreset GetDefaultPreset => Resources.Load<Rope2D_RopePreset>("Rope2D/DefaultRope2D");
+        public static Rope2D_RopePreset GetDefaultPreset => Resources.Load<Rope2D_RopePreset>("Rope2D/DefaultRope2D");
         private static GameObject GetDefaultRope => Resources.Load<GameObject>("Rope2D/DefaultRope2D");
 
 
@@ -35,7 +36,6 @@ namespace MazurkaGameKit.Rope2D
             
             EditorUtility.SetDirty(gameObject);
         }
-        
         
         public void DrawRopeInEditor()
         {
