@@ -10,6 +10,8 @@ namespace MazurkaGameKit.Rope2D
     [CustomEditor(typeof(Rope2D)), CanEditMultipleObjects]
     public class Rope2D_Editor : Editor
     {
+        private const float TENSION_HANDLE_FACTOR = 0.05f;
+        
         private Rope2D targetRope;
         
         private SerializedProperty m_drawOnStart;
@@ -30,7 +32,6 @@ namespace MazurkaGameKit.Rope2D
         
         private bool canSimulate;
 
-        private const float TENSION_HANDLE_FACTOR = 0.05f;
         
         
         private void OnEnable()
@@ -65,11 +66,40 @@ namespace MazurkaGameKit.Rope2D
             EditorApplication.update -= Simulate;
         }
         
+        
+        
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            EditorGUILayout.BeginVertical("box");
             
+            DrawMainPanel();
+            
+            EditorGUILayout.Space(10f);
+
+            DrawPhysicsPanel();
+            
+            EditorGUILayout.Space(10f);
+            
+            DrawRopeObjectPanel();
+            
+            EditorGUILayout.Space(30f);
+
+            DrawSimulationPanel();
+            
+            //Shortcut
+            Event lastEvent = Event.current;
+
+            if (lastEvent.keyCode == KeyCode.S && lastEvent.type == EventType.KeyDown)
+            {
+                targetRope.DrawRopeInEditor();
+                canSimulate = true;
+            }
+            
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawMainPanel()
+        {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.PropertyField(m_drawOnStart);
             EditorGUILayout.PropertyField(m_isBridgeRope);
@@ -100,9 +130,10 @@ namespace MazurkaGameKit.Rope2D
                 serializedObject.ApplyModifiedProperties();
                 targetRope.DrawRopeInEditor();
             }
-            
-            EditorGUILayout.Space(10f);
-            
+        }
+
+        private void DrawPhysicsPanel()
+        {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.PropertyField(m_iteration);
             EditorGUILayout.PropertyField(m_damp);
@@ -124,9 +155,10 @@ namespace MazurkaGameKit.Rope2D
             EditorGUILayout.PropertyField(m_ropeCanBreak);
             EditorGUILayout.PropertyField(m_ropeBreakThreshold);
             EditorGUILayout.EndVertical();
-            
-            EditorGUILayout.Space(30f);
-            
+        }
+
+        private void DrawRopeObjectPanel()
+        {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.PropertyField(m_ropesObject);
             if (GUILayout.Button("Get All Child Rope Objects"))
@@ -134,32 +166,31 @@ namespace MazurkaGameKit.Rope2D
                 targetRope.GetAllChildRopeObject();
             }
             EditorGUILayout.EndVertical();
-            
-            EditorGUILayout.Space(30f);
-            
+
+        }
+
+        private void DrawSimulationPanel()
+        {
+                        
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("Be careful, editor simulation is not always representative of in game simulation");
             EditorGUILayout.LabelField("Shortcut : Keydown S");
             if (GUILayout.Button("Simulate"))
             {
+                if (canSimulate)
+                {
+                    canSimulate = false;
+                    return;
+                }
+      
                 targetRope.DrawRopeInEditor();
                 canSimulate = true;
             }
             EditorGUILayout.EndVertical();
-            EditorGUILayout.EndVertical();
-            
-            serializedObject.ApplyModifiedProperties();
-
-            
-            Event lastEvent = Event.current;
-
-            if (lastEvent.keyCode == KeyCode.S && lastEvent.type == EventType.KeyDown)
-            {
-                targetRope.DrawRopeInEditor();
-                canSimulate = true;
-            }
         }
-
+        
+        
+        
         private void OnSceneGUI()
         {
             Vector3 startPos = targetRope.StartAnchor.position;

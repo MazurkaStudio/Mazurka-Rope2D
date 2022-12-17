@@ -70,14 +70,8 @@ namespace MazurkaGameKit.Rope2D
             
             DrawVisualProperties();
 
-            EditorGUI.BeginChangeCheck();
-            simulate = EditorGUILayout.Toggle("Simulate : ", simulate);
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                if(simulate == false)
-                    targetSwingObject.ResetSwingObject();
-            }
+            DrawSimulationPanel();
+            
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -122,8 +116,35 @@ namespace MazurkaGameKit.Rope2D
             }
             
             EditorGUILayout.EndVertical();
+            
+            //SHORTCUTS
+            Event lastEvent = Event.current;
+
+            if (lastEvent.keyCode == KeyCode.S && lastEvent.type == EventType.KeyDown)
+            {
+                simulate = !simulate;
+            }
         }
 
+        private void DrawSimulationPanel()
+        {
+            EditorGUILayout.BeginVertical("box");
+            EditorGUI.BeginChangeCheck();
+            
+            EditorGUILayout.LabelField("Be careful, editor simulation is not always representative of in game simulation");
+            EditorGUILayout.LabelField("Shortcut : Keydown S");
+            
+            simulate = EditorGUILayout.Toggle("Simulate : ", simulate);
+            
+            if (EditorGUI.EndChangeCheck())
+            {
+                if(simulate == false)
+                    targetSwingObject.ResetSwingObject();
+            }
+            
+            EditorGUILayout.EndVertical();
+        }
+        
         private void OnSceneGUI()
         {
             EditorGUI.BeginChangeCheck();
@@ -160,6 +181,15 @@ namespace MazurkaGameKit.Rope2D
                 targetSwingObject.ChainWidth = chainWidth;
                 
                 EditorUtility.SetDirty(targetSwingObject.gameObject);
+            }
+            
+            
+            //SHORTCUTS
+            Event lastEvent = Event.current;
+
+            if (lastEvent.keyCode == KeyCode.S && lastEvent.type == EventType.KeyDown)
+            {
+                simulate = !simulate;
             }
         }
 
