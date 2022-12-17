@@ -7,7 +7,7 @@ namespace MazurkaGameKit.Rope2D
     {
 #if UNITY_EDITOR
         
-        [MenuItem("GameObject/Mazurka GameKit/Rope2D")]
+        [MenuItem("GameObject/Mazurka GameKit/Rope2D/New Rope2D")]
         public static void CreateRope()
         {
             GameObject g = Instantiate(GetDefaultRope);

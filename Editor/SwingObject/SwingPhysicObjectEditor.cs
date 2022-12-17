@@ -11,7 +11,7 @@ namespace MazurkaGameKit.Rope2D
         private const float SWING_OBJECT_SCALE_HANDLES_FACTOR = 1f;
         private const float ROPE_SCALE_HANDLES_FACTOR = 2f;
         
-        [MenuItem("GameObject/Mazurka GameKit/Hanged Physic Object")]
+        [MenuItem("GameObject/Mazurka GameKit/Rope2D/New Hanged Physic Object")]
         public static void CreateSwingPhysicObject()
         {
             GameObject g = new GameObject("New Hanged Physic Object");

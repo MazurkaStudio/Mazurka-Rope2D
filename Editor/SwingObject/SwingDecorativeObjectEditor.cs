@@ -13,7 +13,7 @@ namespace MazurkaGameKit.Rope2D
         private const float ROPE_SCALE_HANDLES_FACTOR = 2f;
         
         
-        [MenuItem("GameObject/Mazurka GameKit/Hanged Decorative Object")]
+        [MenuItem("GameObject/Mazurka GameKit/Rope2D/New Hanged Decorative Object")]
         public static void CreateSwingDecorativeObject()
         {
             GameObject g = new GameObject("New Hanged Decorative Object");
