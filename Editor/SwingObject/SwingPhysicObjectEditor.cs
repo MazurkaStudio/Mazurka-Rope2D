@@ -35,8 +35,6 @@ namespace MazurkaGameKit.Rope2D
             targetSwingObject = (SwingPhysicObject)target;
             targetSwingObject.CheckRope();
             InitSerializedProperties();
-            
-            targetSwingObject.transform.hasChanged = false;
         }
         
         private void InitSerializedProperties()
@@ -191,14 +189,6 @@ namespace MazurkaGameKit.Rope2D
                 
                 EditorUtility.SetDirty(targetSwingObject.gameObject);
             }
-
-
-            if (targetSwingObject.transform.hasChanged)
-            {
-                targetSwingObject.transform.hasChanged = false;
-                targetSwingObject.GetRope.DrawRopeInEditor();
-            }
         }
     }
-
 }

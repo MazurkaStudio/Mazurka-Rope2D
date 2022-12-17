@@ -18,8 +18,7 @@ namespace MazurkaGameKit.Rope2D
         
         [SerializeField] private Transform swingObjectTransform;
         [SerializeField] private Transform swingObjectModel;
-        [SerializeField] private Transform ropeFolder;
-  
+
         public bool UseMaxDistanceOnly => useMaxDistanceOnly;
         public float SwingObjectSize => swingObjectModel.localScale.x;
         public float ChainWidth
@@ -103,7 +102,7 @@ namespace MazurkaGameKit.Rope2D
         {
             if (physicRope == null)
             {
-                physicRope = Rope2D.CreateRope(dJoin.connectedBody.transform, swingObjectTransform, ropePreset, transform, true, -3f); // = -1.5f tension to simulate hard tension on the rope
+                physicRope = Rope2D.CreateRope(dJoin.connectedBody.transform,swingObjectTransform, ropePreset, transform, true, -1f); // = -1.5f tension to simulate hard tension on the rope
                 physicRope.gameObject.name = "_PhysicRope";
             }
             
@@ -210,6 +209,9 @@ namespace MazurkaGameKit.Rope2D
             
             swingObjectBody = dJoin.attachedRigidbody;
             swingObjectBody.bodyType = RigidbodyType2D.Dynamic;
+            swingObjectBody.gravityScale = 4f;
+            swingObjectBody.angularDrag = 3f;
+            swingObjectBody.drag = 0.3f;
             
             if (dJoin.connectedBody == null)
             {

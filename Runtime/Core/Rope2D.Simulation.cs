@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -47,7 +48,6 @@ namespace MazurkaGameKit.Rope2D
             } 
             else if (_isStretchable) SetNewLenght(distance);
         }
-        
         private void SimpleRopeConstraints()
         {
             //Constraint to First Point 
@@ -80,7 +80,6 @@ namespace MazurkaGameKit.Rope2D
             //Constraint to First Point 
             RopeSegmentsNow[0] = StartAnchor.position;
         }
-
         private void BridgeRopeConstraints()
         {
             //Constraint to First Point 
@@ -117,20 +116,12 @@ namespace MazurkaGameKit.Rope2D
                     RopeSegmentsNow[i] += changeAmount;
                     RopeSegmentsNow[i + 1] = RopeSegmentsNow[i];
                 }
-
-                //Constraint to First Point 
-                RopeSegmentsNow[0] = StartAnchor.position;
-
-                //Constraint to End Point 
-                RopeSegmentsNow[^1] = EndAnchor.position;
             }
         }
-
         private void DrawRope()
         {
             lineRenderer.SetPositions(RopeSegmentsNow);
         }
-
 
         
 
@@ -141,17 +132,14 @@ namespace MazurkaGameKit.Rope2D
                 ropeObject.InitializeRopeObject(this);
             }
         }
-        
         private void RegisterRopeObject(Rope2DFixedObject ropeFixedObject)
         {
             _allRope2DObjects.Add(ropeFixedObject);
         }
-
         private void UnregisterRopeObject(Rope2DFixedObject ropeFixedObject)
         {
             _allRope2DObjects.Remove(ropeFixedObject);
         }
-        
         private void UpdateObjects()
         {
             foreach (var ropeObject in _allRope2DObjects)
@@ -160,7 +148,8 @@ namespace MazurkaGameKit.Rope2D
             }
         }
         
-        #if UNITY_EDITOR
+
+#if UNITY_EDITOR
 
         [ContextMenu("Get All Child Rope Objects")]
         public void GetAllChildRopeObject()

@@ -97,8 +97,6 @@ namespace MazurkaGameKit.Rope2D
             SimulateRope();
             DrawRope();
             UpdateObjects();
-            
-            Debug.Log(Vector3.Distance(EndAnchor.position , RopeSegmentsNow[^1]));
         }
 
         private void OnDisable()
