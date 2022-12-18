@@ -153,17 +153,17 @@ namespace MazurkaGameKit.Rope2D
 
             //ROOT HANDLE
             Handles.color = Color.magenta;
-            Handles.DrawSolidDisc(targetSwingObject.GetRootAnchorPosition, Vector3.forward, 0.2f); 
+            Handles.DrawSolidDisc(targetSwingObject.GetRootAnchorPosition, Vector3.forward, HandleUtility.GetHandleSize(targetSwingObject.GetRootAnchorPosition) * 0.1f); 
             
             //DISTANCE HANDLE
             Vector3 swingObjectAnchorPosition = targetSwingObject.GetSwingObjectPosition;
-            swingObjectAnchorPosition = Handles.Slider(swingObjectAnchorPosition, Vector3.down, .2f, Handles.DotHandleCap, 0f);
+            swingObjectAnchorPosition = Handles.Slider(swingObjectAnchorPosition, Vector3.down, HandleUtility.GetHandleSize(swingObjectAnchorPosition) * 0.1f, Handles.DotHandleCap, 0f);
             Handles.DrawDottedLine(targetSwingObject.GetRootAnchorPosition, swingObjectAnchorPosition, 5f);
 
 
             //SCALE HANDLE
             Vector3 scalePos = targetSwingObject.GetSwingObjectPosition + Vector3.right * (targetSwingObject.SwingObjectSize * SWING_OBJECT_SCALE_HANDLES_FACTOR);
-            scalePos = Handles.Slider(scalePos, Vector3.right, 0.1f, Handles.DotHandleCap, 0f);
+            scalePos = Handles.Slider(scalePos, Vector3.right, HandleUtility.GetHandleSize(scalePos) * 0.05f, Handles.DotHandleCap, 0f);
             float scale = (scalePos.x - targetSwingObject.GetSwingObjectPosition.x);
             Handles.DrawWireDisc(targetSwingObject.GetSwingObjectPosition, Vector3.forward, scale, 0.05f); 
             
@@ -172,7 +172,7 @@ namespace MazurkaGameKit.Rope2D
             float chainWidth = targetSwingObject.ChainWidth;
             Vector3 centerPos = targetSwingObject.GetSwingObjectPosition + (targetSwingObject.GetRootAnchorPosition - targetSwingObject.GetSwingObjectPosition) / 2;
             Vector3 scalRopePos = centerPos + (Vector3.right * chainWidth * ROPE_SCALE_HANDLES_FACTOR);
-            scalRopePos = Handles.Slider(scalRopePos, Vector3.right, 0.1f, Handles.DotHandleCap, 0f);
+            scalRopePos = Handles.Slider(scalRopePos, Vector3.right, HandleUtility.GetHandleSize(scalRopePos) * 0.05f, Handles.DotHandleCap, 0f);
             chainWidth = (scalRopePos.x - targetSwingObject.GetSwingObjectPosition.x) / ROPE_SCALE_HANDLES_FACTOR;
             Handles.DrawLine(scalRopePos + Vector3.up, scalRopePos + Vector3.down, 0.05f); 
             

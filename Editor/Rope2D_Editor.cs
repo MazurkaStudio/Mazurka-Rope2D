@@ -203,11 +203,11 @@ namespace MazurkaGameKit.Rope2D
             
             EditorGUI.BeginChangeCheck();
             
-            startPos = Handles.FreeMoveHandle(startPos, Quaternion.identity, 0.2f, Vector3.zero,
+            startPos = Handles.FreeMoveHandle(startPos, Quaternion.identity, HandleUtility.GetHandleSize(startPos) * 0.05f, Vector3.zero,
                 Handles.DotHandleCap);
             
             Handles.color = Color.cyan;
-            endPos = Handles.FreeMoveHandle(endPos, Quaternion.identity, 0.2f, Vector3.zero,
+            endPos = Handles.FreeMoveHandle(endPos, Quaternion.identity, HandleUtility.GetHandleSize(endPos) * 0.05f, Vector3.zero,
                 Handles.DotHandleCap);
             
             if (EditorGUI.EndChangeCheck())
@@ -232,7 +232,7 @@ namespace MazurkaGameKit.Rope2D
             EditorGUI.BeginChangeCheck();
             
             Handles.color = Color.magenta;
-            tensionPos = Handles.Slider(tensionPos, ropeDir, 0.2f,
+            tensionPos = Handles.Slider(tensionPos, ropeDir, HandleUtility.GetHandleSize(endPos) * 0.1f,
                 Handles.SphereHandleCap, 0f);
 
             if (EditorGUI.EndChangeCheck())
