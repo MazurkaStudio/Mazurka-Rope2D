@@ -7,16 +7,8 @@ namespace MazurkaGameKit.Rope2D
     {
 #if UNITY_EDITOR
         
-        [MenuItem("GameObject/Mazurka GameKit/Rope2D/New Rope2D")]
-        public static void CreateRope()
-        {
-            GameObject g = Instantiate(GetDefaultRope);
-            g.name = "New Rope2D";
-            Rope2DEditorHelper.FocusObject(g);
-        }
-        
         public static Rope2D_RopePreset GetDefaultPreset => Resources.Load<Rope2D_RopePreset>("Rope2D/DefaultRope2D");
-        private static GameObject GetDefaultRope => Resources.Load<GameObject>("Rope2D/DefaultRope2D");
+        public static GameObject GetDefaultRope => Resources.Load<GameObject>("Rope2D/DefaultRope2D");
 
 
         public void SetDefaultTension(float value) => _defaultRopeTension = value;

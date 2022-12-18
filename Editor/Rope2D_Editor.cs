@@ -10,6 +10,14 @@ namespace MazurkaGameKit.Rope2D
     [CustomEditor(typeof(Rope2D)), CanEditMultipleObjects]
     public class Rope2D_Editor : Editor
     {
+        [MenuItem("GameObject/Mazurka GameKit/Rope2D/New Rope2D")]
+        public static void CreateRope()
+        {
+            GameObject g = Instantiate(Rope2D.GetDefaultRope);
+            g.name = "New Rope2D";
+            Rope2DEditorHelper.FocusObject(g);
+        }
+        
         private const float TENSION_HANDLE_FACTOR = 0.05f;
         
         private Rope2D targetRope;
