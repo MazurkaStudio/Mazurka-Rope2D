@@ -20,7 +20,7 @@ namespace MazurkaGameKit.Rope2D
         public Vector3 GetSwingObjectPosition => swingObjectBody.position;
         public SpriteRenderer GetChainSprite => chainSpriteRenderer;
 
-        
+        public float Distance => Vector2.Distance(GetRootAnchorPosition, GetSwingObjectPosition);
         
         private void Start()
         {
