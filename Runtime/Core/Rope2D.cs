@@ -197,6 +197,7 @@ namespace MazurkaGameKit.Rope2D
             IsEnable = false;
             lineRenderer.enabled = false;
             isEnable?.Invoke(false);
+            wasInit = false;
         }
 
         public void BreakRope()

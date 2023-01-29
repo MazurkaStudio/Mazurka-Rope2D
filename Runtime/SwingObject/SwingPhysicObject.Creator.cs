@@ -73,7 +73,7 @@ namespace MazurkaGameKit.Rope2D
             }
             else
             {
-                if (chain.TryGetComponent(out chainRopeSprite))
+                if (chain.TryGetComponent(out chainRope))
                 {
                     _chainWidth = chainRope.transform.localScale.x;
                     chainRopeSprite = chainRope.sprite;
