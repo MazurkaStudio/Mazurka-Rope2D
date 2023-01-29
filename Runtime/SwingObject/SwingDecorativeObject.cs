@@ -6,7 +6,7 @@ namespace MazurkaGameKit.Rope2D
     public partial class SwingDecorativeObject : MonoBehaviour
     {
         [SerializeField] private bool isConstant = true;
-        [SerializeField, Range(1f, 45f)] private float windAmplitude = 3f;
+        [SerializeField, Range(.1f, 45f)] private float windAmplitude = 3f;
         [SerializeField, Range(0.01f, 5f)] private float windFrequency = .6f;
      
         
@@ -64,7 +64,7 @@ namespace MazurkaGameKit.Rope2D
 
         public void ResetSwingObject()
         {
-            swingObjectBody.localPosition = Vector3.down * Vector2.Distance(GetRootAnchorPosition, GetSwingObjectPosition);
+            swingObjectBody.localPosition = Vector3.down * Distance;
             transform.eulerAngles = Vector3.zero;
             swingObjectBody.eulerAngles = Vector3.zero;
             chainSpriteRenderer.transform.rotation = LookAt2D((GetRootAnchorPosition - GetSwingObjectPosition).normalized);

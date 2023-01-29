@@ -27,7 +27,7 @@ namespace MazurkaGameKit.Rope2D
         }
         
         public float SwingObjectSize => swingObjectModel.localScale.x;
-        
+        public float Distance => Vector2.Distance(GetRootAnchorPosition, GetSwingObjectPosition);
         public void CheckRope()
         {
             CreateHangedObject();
@@ -114,7 +114,7 @@ namespace MazurkaGameKit.Rope2D
         //UTILS
         public void UpdateRope()
         {
-            chainSpriteRenderer.size = new Vector2(chainSpriteRenderer.sprite.bounds.size.x, (Vector2.Distance(GetRootAnchorPosition, swingObjectBody.transform.position)) / chainSpriteRenderer.transform.localScale.y);
+            chainSpriteRenderer.size = new Vector2(chainSpriteRenderer.sprite.bounds.size.x, Distance / chainSpriteRenderer.transform.localScale.y);
         }
         public void SetSwingObjectPosition(Vector3 position)
         {
