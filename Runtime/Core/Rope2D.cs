@@ -79,6 +79,8 @@ namespace MazurkaGameKit.Rope2D
             newRope._isExtendable = isExtendable;
             newRope._ropeCanBreak = ropeCanBreak;
             newRope._ropeBreakThreshold = ropeBreakThreshold;
+
+            newRope.EnableRope();
             return newRope;
         }
         
@@ -87,6 +89,8 @@ namespace MazurkaGameKit.Rope2D
 
         private void OnEnable()
         {
+            if (lineRenderer == null) return;
+            
             EnableRope();
         }
 
@@ -122,7 +126,7 @@ namespace MazurkaGameKit.Rope2D
         private void InitializeRope()
         {
             //CHECK FOR ALL COMPONENTS
-            if (EndAnchor == null || StartAnchor == null || _ropePreset == null || EndAnchor == StartAnchor)
+            if (EndAnchor == null || StartAnchor == null || _ropePreset == null)
             {
                 DisableRope();
                 throw new System.Exception(("Rope is not correctly initialized = " + gameObject.name));
