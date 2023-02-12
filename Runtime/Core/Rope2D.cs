@@ -47,6 +47,7 @@ namespace MazurkaGameKit.Rope2D
         public bool IsBridgeRope => _isBridgeRope;
         public bool IsExtendable => _isExtendable;
         public bool IsStretchable => _isStretchable;
+        public float Distance => Vector3.Distance(_startAnchor.position, _endAnchor.position);
 
         public bool IsEnable { get; private set; } = true;
         public Vector3[] RopeSegmentsOld { get; private set; }
@@ -56,12 +57,19 @@ namespace MazurkaGameKit.Rope2D
         public float RopeSegLenght { get; private set; }
         public float Tension { get; private set; }
 
+        public void SetDamp(float value) => _damp = value; 
+        public void SetGravity(Vector3 value) => _gravity = value; 
 
+
+        private Transform lastParent;
+        
         public UnityAction<bool> isEnable;
+        public UnityAction onBreak;
+        public UnityAction onRebuildBridge;
        
         
         public static Rope2D CreateRope(Transform from, Transform to, Rope2D_RopePreset ropePreset, Transform parent, 
-            bool isBridgeRope = false,  float defaultTension = 0f, bool isExtendable = false, bool isStretchable = false, bool ropeCanBreak  = false, float ropeBreakThreshold = 1.5f)
+            bool isBridgeRope = false,  float defaultTension = 0f, bool isExtendable = false, bool isStretchable = false, bool ropeCanBreak  = false, float ropeBreakThreshold = 1.5f, float damp = 1f, Vector3 gravity = default)
         {
             Rope2D newRope = new GameObject("Rope_" + from.name + " to " + to.name).AddComponent<Rope2D>();
             newRope.lineRenderer = newRope.GetComponent<LineRenderer>();
@@ -74,6 +82,8 @@ namespace MazurkaGameKit.Rope2D
             newRope.SetRopePreset(ropePreset);
             
             newRope._isBridgeRope = isBridgeRope;
+            newRope._gravity = gravity;
+            newRope._damp = damp;
             newRope._defaultRopeTension = defaultTension;
             newRope._isStretchable = isStretchable;
             newRope._isExtendable = isExtendable;
@@ -192,6 +202,7 @@ namespace MazurkaGameKit.Rope2D
             lineRenderer.enabled = true;
             IsEnable = true;
             isEnable?.Invoke(true);
+          
         }
 
         public void FreezeRope(bool value) => _simulate = value;
@@ -208,12 +219,19 @@ namespace MazurkaGameKit.Rope2D
         {
             if(_isBridgeRope)
             {
+                lastParent = EndAnchor.parent;
                 EndAnchor.transform.SetParent(transform);
                 _isBridgeRope = false;
+                onBreak?.Invoke();
             }
         }
 
-        public void RebuildBridge() => _isBridgeRope = true;
+        public void RebuildBridge()
+        {
+            EndAnchor.transform.SetParent(lastParent);
+            _isBridgeRope = true;
+            onRebuildBridge?.Invoke();
+        }
 
         public void SetNewLenght(float newDistance)
         {
