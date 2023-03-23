@@ -9,7 +9,7 @@ namespace MazurkaGameKit.Rope2D
         private void SimulateRope()
         {
             RopeForceSumm = Vector3.zero;
-
+  
             for (int i = 1; i < RopeSegmentsNow.Length; i++)
             {
                 Vector3 velocity = RopeSegmentsNow[i] - RopeSegmentsOld[i];
@@ -17,7 +17,13 @@ namespace MazurkaGameKit.Rope2D
                 RopeSegmentsNow[i] += velocity;
                 RopeSegmentsNow[i] += _gravity * Time.fixedDeltaTime;
                 RopeSegmentsNow[i] += -velocity * _damp * Time.fixedDeltaTime;
-                RopeForceSumm += RopeSegmentsNow[i] - RopeSegmentsOld[i];
+                
+                for (int j = 0; j < _externalForces.Length; j++)
+                {
+                    RopeSegmentsNow[i] += _externalForces[j].GetExternalForce(i) * Time.fixedDeltaTime;
+                }
+                
+                RopeForceSumm += velocity;
             }
 
             if (_isBridgeRope)

@@ -37,7 +37,9 @@ namespace MazurkaGameKit.Rope2D
         
         private bool wasInit;
         private bool isVisible;
-      
+
+        private I2DRopeExternalForce[] _externalForces;
+        
         
         public Rope2D_RopePreset Preset => _ropePreset;
         public float RopeEnergy => RopeForceSumm.magnitude;
@@ -147,6 +149,13 @@ namespace MazurkaGameKit.Rope2D
 
             DrawRope();
             InitializeRopeObjects();
+            
+            _externalForces = GetComponentsInChildren<I2DRopeExternalForce>();
+            
+            for (int i = 0; i < _externalForces.Length; i++)
+            {
+                _externalForces[i].Initialize(this);
+            }
             
             wasInit = true;
         }

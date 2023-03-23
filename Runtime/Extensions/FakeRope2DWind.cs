@@ -7,27 +7,57 @@ using Random = UnityEngine.Random;
 namespace MazurkaGameKit.Rope2D
 {
     [RequireComponent(typeof(Rope2D))]
-    public class FakeRope2DWind : MonoBehaviour
+    public class FakeRope2DWind : MonoBehaviour, I2DRopeExternalForce
     {
-        [SerializeField] private Rope2D targetRope;
-        [SerializeField, Range(0.01f, 0.1f)] private float windForce = 0.05f;
-        [SerializeField, Range(0.01f, 3f)] private float windFreq = 0.5f;
+        [SerializeField] private float windFrequency = 0.5f;
+        [SerializeField] private float windAmplitude = 1.0f;
+        [SerializeField] private Vector3 windDirection = new Vector3(1, 0, 0);
+        
+        private Vector3[] windForces;
+        private int ropeNodeCount;
 
-        private int targetSeg;
-
-        private void Reset()
+        private Vector3 CalculateWindForce(float time, float phase)
         {
-            targetRope = GetComponent<Rope2D>();
+            float at = (time + phase) * windFrequency;
+            float windStrength = Mathf.PerlinNoise(at, at) * windAmplitude;
+            Vector3 windForce = windDirection.normalized * windStrength;
+            return windForce;
         }
 
-        private void Start()
+        private void UpdateWind()
         {
-            targetSeg = Random.Range(1, targetRope.RopeSegmentsNow.Length);
+            for (int i = 0; i < ropeNodeCount; i++)
+            {
+                windForces[i] = CalculateWindForce(Time.time, (float)i / (float)ropeNodeCount);
+            }
+        }
+
+        public void Initialize(Rope2D rope)
+        {
+            ropeNodeCount = rope.RopeSubDivision;
+            
+            windForces = new Vector3[rope.RopeSubDivision];
+           
+            // Initialize the node positions along the rope
+            for (int i = 0; i < ropeNodeCount; i++)
+            {
+                float phase = (float)i / (float)ropeNodeCount;
+                windForces[i] = CalculateWindForce(Time.time, phase);
+            }
         }
 
         private void FixedUpdate()
         {
-            targetRope.RopeSegmentsNow[targetSeg] += Vector3.up * (Mathf.PerlinNoise(Time.time * windFreq, 0f) * windForce - windForce /2f);
+            UpdateWind();
         }
+
+        public bool IsGlobal => false;
+
+        public Vector3 GetExternalForce(int index)
+        {
+            return windForces[index];
+        }
+
+        public Vector3 GetGlobalForce() => Vector3.zero;
     }
 }
