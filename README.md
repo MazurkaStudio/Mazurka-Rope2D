@@ -126,5 +126,10 @@ For rope objects, you just need to add Rope2DFixedObject script on your object, 
 Documentation will be available soon...
 ___
 
+## And next ?
+
+I'm working on feature as collisions, compute shader and jobs system.
+
+___
 <sub> Tool by Lilian Millers. <br />
 Sprites by Antoine Perrenot.</sub>
