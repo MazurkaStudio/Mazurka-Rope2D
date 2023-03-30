@@ -38,7 +38,7 @@ namespace MazurkaGameKit.Rope2D
         private bool wasInit;
         private bool isVisible;
 
-        private I2DRopeExternalForce[] _externalForces;
+        private I2DRopeExternalForce[] _externalForces = new I2DRopeExternalForce[0];
         
         
         public Rope2D_RopePreset Preset => _ropePreset;
@@ -75,7 +75,7 @@ namespace MazurkaGameKit.Rope2D
         {
             Rope2D newRope = new GameObject("Rope_" + from.name + " to " + to.name).AddComponent<Rope2D>();
             newRope.lineRenderer = newRope.GetComponent<LineRenderer>();
-            newRope.lineRenderer.textureMode = LineTextureMode.Tile;
+            newRope.lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
             newRope.transform.SetParent(parent);
             newRope.transform.localPosition = Vector3.zero;
             newRope.transform.localEulerAngles = Vector3.zero;

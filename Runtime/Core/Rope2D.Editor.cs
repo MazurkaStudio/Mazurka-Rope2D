@@ -19,7 +19,7 @@ namespace MazurkaGameKit.Rope2D
             if (_ropePreset == null) _ropePreset = GetDefaultPreset;
             if (lineRenderer == null) lineRenderer = GetComponent<LineRenderer>();
             
-            lineRenderer.textureMode = LineTextureMode.Tile;
+            lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
             lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             lineRenderer.receiveShadows = false;
             lineRenderer.allowOcclusionWhenDynamic = false;

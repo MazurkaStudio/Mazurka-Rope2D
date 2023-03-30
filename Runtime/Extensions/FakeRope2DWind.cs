@@ -15,11 +15,17 @@ namespace MazurkaGameKit.Rope2D
         
         private Vector3[] windForces;
         private int ropeNodeCount;
+        private int seed;
+
+        private void Start()
+        {
+            seed = Random.Range(0, 1000);        
+        }
 
         private Vector3 CalculateWindForce(float time, float phase)
         {
             float at = (time + phase) * windFrequency;
-            float windStrength = Mathf.PerlinNoise(at, at) * windAmplitude;
+            float windStrength = Mathf.PerlinNoise(at + seed, at + seed) * windAmplitude;
             Vector3 windForce = windDirection.normalized * windStrength;
             return windForce;
         }
