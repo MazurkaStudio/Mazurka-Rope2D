@@ -206,12 +206,16 @@ namespace MazurkaGameKit.Rope2D
             {
                 swingObjectTransform = dJoin.transform;
             }
-            
-            swingObjectBody = dJoin.attachedRigidbody;
-            swingObjectBody.bodyType = RigidbodyType2D.Dynamic;
-            swingObjectBody.gravityScale = 4f;
-            swingObjectBody.angularDrag = 3f;
-            swingObjectBody.drag = 0.3f;
+
+            if (swingObjectBody == null)
+            {
+                swingObjectBody = dJoin.attachedRigidbody;
+                swingObjectBody.bodyType = RigidbodyType2D.Dynamic;
+                swingObjectBody.gravityScale = 1f;
+                swingObjectBody.angularDrag = 3f;
+                swingObjectBody.drag = 0.3f;
+            }
+ 
             
             if (dJoin.connectedBody == null)
             {
